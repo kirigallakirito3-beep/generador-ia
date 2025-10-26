@@ -1,41 +1,52 @@
 // server.js
+
 import express from "express";
 import cors from "cors";
-import OpenAI from "openai";
+import { Configuration, OpenAIApi } from "openai";
 
+// Crear la app de Express
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Para poder leer JSON en el body
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Render usará tu variable de entorno
+// Configurar OpenAI con la API Key de Render
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY, // Asegúrate de configurar esta variable en Render
 });
+const openai = new OpenAIApi(configuration);
 
-// Endpoint principal
+// Endpoint para generar código
 app.post("/api/generar", async (req, res) => {
   try {
     const { prompt, idioma, historial } = req.body;
 
-    const mensajes = [
-      { role: "system", content: `Eres una IA experta en programación y hablas en ${idioma}.` },
-      ...(historial || []),
-      { role: "user", content: prompt }
-    ];
+    if (!prompt) {
+      return res.status(400).json({ error: "No se recibió prompt" });
+    }
 
+    // Llamada a OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: mensajes,
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: "Eres un asistente que genera código de apps según la descripción del usuario." },
+        ...historial,
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
     });
 
     const respuesta = completion.choices[0].message.content;
-    res.json({ respuesta });
+
+    // Actualizar historial
+    const nuevoHistorial = [...historial, { role: "user", content: prompt }, { role: "assistant", content: respuesta }];
+
+    res.json({ respuesta, historial: nuevoHistorial });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error generando código" });
+    res.status(500).json({ error: "Error al generar código con OpenAI" });
   }
 });
 
-// Puerto
+// Puerto dinámico que Render asigna
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
-

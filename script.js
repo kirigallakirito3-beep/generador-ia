@@ -21,7 +21,7 @@ generarBtn.addEventListener("click", async () => {
   const lenguaje = lenguajeSelect.value;
 
   try {
-    // Enviar solicitud al backend
+    // --- Aquí va el fetch ---
     const response = await fetch("https://TU_LINK_RENDER/api/generar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -32,7 +32,6 @@ generarBtn.addEventListener("click", async () => {
       }),
     });
 
-    // Convertir respuesta a JSON
     const data = await response.json();
 
     if (data.respuesta) {

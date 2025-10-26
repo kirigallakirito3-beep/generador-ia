@@ -1,11 +1,9 @@
-// script.js
-
 const generarBtn = document.getElementById("generarBtn");
 const descripcion = document.getElementById("descripcion");
 const resultado = document.getElementById("resultado");
-const lenguajeSelect = document.getElementById("lenguaje"); // si agregas un select de lenguaje
+const lenguajeSelect = document.getElementById("lenguaje");
 
-// Historial local para la sesión
+// Historial local
 let historial = [];
 
 generarBtn.addEventListener("click", async () => {
@@ -15,24 +13,20 @@ generarBtn.addEventListener("click", async () => {
     return;
   }
 
-  // Puedes agregar un select en tu HTML para elegir idioma, por ahora español
-  const idioma = "es";
+  const idioma = "es"; // Puedes cambiar a "en" si quieres respuestas en inglés
+  const lenguaje = lenguajeSelect.value;
 
-  // Enviar petición al backend
   try {
     const response = await fetch("https://TU_LINK_RENDER/api/generar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, idioma, historial }),
+      body: JSON.stringify({ prompt: `${prompt} (Generar en ${lenguaje})`, idioma, historial }),
     });
 
     const data = await response.json();
 
     if (data.respuesta) {
-      // Guardamos el historial
-      historial = data.historial;
-
-      // Mostramos el resultado
+      historial = data.historial; // actualiza historial
       resultado.textContent = data.respuesta;
     } else {
       resultado.textContent = "Error: no se recibió respuesta de la IA.";

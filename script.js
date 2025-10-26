@@ -21,8 +21,8 @@ generarBtn.addEventListener("click", async () => {
   const lenguaje = lenguajeSelect.value;
 
   try {
-    // --- Aquí va el fetch ---
-    const response = await fetch("https://generador-ia-7m7r.onrender.com", {
+    // --- Fetch al backend con tu URL real ---
+    const response = await fetch("https://generador-ia-7m7r.onrender.com/api/generar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -47,4 +47,3 @@ generarBtn.addEventListener("click", async () => {
     resultado.textContent = "Error al conectar con el servidor.";
   }
 });
-

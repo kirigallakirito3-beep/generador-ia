@@ -22,7 +22,7 @@ generarBtn.addEventListener("click", async () => {
 
   try {
     // --- Fetch al backend con tu URL real ---
-    const response = await fetch("https://generador-ia-7m7r.onrender.com/api/generar", {
+    const response = await fetch("https://generador-ia-7m7r.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -47,3 +47,4 @@ generarBtn.addEventListener("click", async () => {
     resultado.textContent = "Error al conectar con el servidor.";
   }
 });
+

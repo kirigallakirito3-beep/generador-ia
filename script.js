@@ -6,10 +6,10 @@ const descripcion = document.getElementById("descripcion");
 const resultado = document.getElementById("resultado");
 const lenguajeSelect = document.getElementById("lenguaje");
 
-// Historial de la sesión
+// Historial local para la sesión
 let historial = [];
 
-// Aquí va el fetch dentro del evento click
+// Evento click del botón
 generarBtn.addEventListener("click", async () => {
   const prompt = descripcion.value.trim();
   if (!prompt) {
@@ -17,26 +17,29 @@ generarBtn.addEventListener("click", async () => {
     return;
   }
 
-  const idioma = "es"; // o "en"
+  const idioma = "es"; // Cambiar a "en" si quieres inglés
   const lenguaje = lenguajeSelect.value;
 
   try {
-    // --- FETCH al backend ---
+    // Enviar solicitud al backend
     const response = await fetch("https://TU_LINK_RENDER/api/generar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        prompt: `${prompt} (Generar en ${lenguaje})`, 
-        idioma, 
-        historial 
+      body: JSON.stringify({
+        prompt: `${prompt} (Generar en ${lenguaje})`,
+        idioma,
+        historial
       }),
     });
 
+    // Convertir respuesta a JSON
     const data = await response.json();
 
     if (data.respuesta) {
-      historial = data.historial; // actualizar historial
-      resultado.textContent = data.respuesta; // mostrar resultado
+      // Actualizar historial
+      historial = data.historial;
+      // Mostrar resultado en el <pre>
+      resultado.textContent = data.respuesta;
     } else {
       resultado.textContent = "Error: no se recibió respuesta de la IA.";
     }

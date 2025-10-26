@@ -1,44 +1,44 @@
-// server.js
-import express from "express";
-import cors from "cors";
-import OpenAI from "openai";
+// script.js
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const generarBtn = document.getElementById("generarBtn");
+const descripcion = document.getElementById("descripcion");
+const resultado = document.getElementById("resultado");
+const lenguajeSelect = document.getElementById("lenguaje"); // si agregas un select de lenguaje
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Debes configurar en Render
-});
-
-// Historial global por sesión simple
+// Historial local para la sesión
 let historial = [];
 
-app.post("/api/generar", async (req, res) => {
+generarBtn.addEventListener("click", async () => {
+  const prompt = descripcion.value.trim();
+  if (!prompt) {
+    alert("Escribe algo antes de generar la app.");
+    return;
+  }
+
+  // Puedes agregar un select en tu HTML para elegir idioma, por ahora español
+  const idioma = "es";
+
+  // Enviar petición al backend
   try {
-    const { prompt, idioma } = req.body;
-
-    historial.push({ role: "user", content: prompt });
-
-    const mensajes = [
-      { role: "system", content: `Eres una IA experta en programación y hablas en ${idioma}.` },
-      ...historial
-    ];
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: mensajes,
+    const response = await fetch("https://TU_LINK_RENDER/api/generar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, idioma, historial }),
     });
 
-    const respuesta = completion.choices[0].message.content;
-    historial.push({ role: "assistant", content: respuesta });
+    const data = await response.json();
 
-    res.json({ respuesta, historial });
+    if (data.respuesta) {
+      // Guardamos el historial
+      historial = data.historial;
+
+      // Mostramos el resultado
+      resultado.textContent = data.respuesta;
+    } else {
+      resultado.textContent = "Error: no se recibió respuesta de la IA.";
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error generando código" });
+    resultado.textContent = "Error al conectar con el servidor.";
   }
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Servidor corriendo en puerto ${PORT}`));
